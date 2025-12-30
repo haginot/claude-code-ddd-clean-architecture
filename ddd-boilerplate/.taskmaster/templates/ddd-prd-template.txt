@@ -1,0 +1,288 @@
+# DDD PRD Template
+# ============================================
+# This template provides structure for writing PRDs
+# that align with Domain-Driven Design principles.
+# ============================================
+
+# INSTRUCTIONS:
+# 1. Copy this template to .taskmaster/docs/prd.txt
+# 2. Fill in each section with your project requirements
+# 3. Run: "Can you parse my PRD at .taskmaster/docs/prd.txt?"
+# 4. Task Master will generate DDD-aligned tasks
+
+# ============================================
+# SECTION 1: PROJECT OVERVIEW
+# ============================================
+# Describe the business problem and context.
+# Focus on the "why" - what business value does this provide?
+
+## Project Name
+[Your project name here]
+
+## Business Context
+[Describe the business domain and problem space]
+# TIP: Think about WHO are the stakeholders and WHAT problems they face
+
+## Goals
+# List 3-5 measurable goals
+- [Goal 1: Specific and measurable]
+- [Goal 2: Specific and measurable]
+- [Goal 3: Specific and measurable]
+
+# ============================================
+# SECTION 2: BOUNDED CONTEXT
+# ============================================
+# Define the boundaries of your domain model.
+# What's IN and what's OUT of scope?
+
+## Primary Bounded Context
+Name: [Context Name]
+Description: [What this context is responsible for]
+
+### Context Boundaries
+# Clearly define what belongs here and what doesn't
+
+#### Included (In Scope):
+- [Capability 1]
+- [Capability 2]
+- [Capability 3]
+
+#### Excluded (Out of Scope):
+- [External capability 1]
+- [External capability 2]
+
+### Related Contexts
+# How does this context interact with others?
+# Types: Upstream, Downstream, Partnership, Shared Kernel, Conformist
+
+| Context | Relationship | Integration Pattern |
+|---------|--------------|---------------------|
+| [Context A] | Upstream | REST API |
+| [Context B] | Downstream | Domain Events |
+
+# ============================================
+# SECTION 3: UBIQUITOUS LANGUAGE
+# ============================================
+# Define the shared vocabulary for your domain.
+# This becomes the naming convention for your code.
+
+## Entities
+# Objects with unique identity that persist over time
+# Format: Name | Definition | Key Properties | Business Rules
+
+| Entity | Definition | Properties | Invariants |
+|--------|------------|------------|------------|
+| [Entity1] | [What it represents] | id, status, createdAt | [Business rule] |
+| [Entity2] | [What it represents] | id, name, ... | [Business rule] |
+
+## Value Objects
+# Immutable objects defined by their attributes, not identity
+# Format: Name | Definition | Validation Rules
+
+| Value Object | Definition | Validation Rules |
+|--------------|------------|------------------|
+| [ValueObject1] | [What it represents] | [Validation] |
+| [ValueObject2] | [What it represents] | [Validation] |
+
+## Aggregates
+# Clusters of entities and value objects with consistency boundaries
+# Format: Aggregate Root | Child Entities | Invariants
+
+| Aggregate Root | Children | Invariants |
+|----------------|----------|------------|
+| [Root1] | [Entity1, ValueObject1] | [Business rule that must always be true] |
+
+## Domain Events
+# Things that happened in the domain (past tense!)
+# Format: Event Name | Trigger | Payload
+
+| Event | Trigger | Payload |
+|-------|---------|---------|
+| [Entity1Created] | When entity1 is created | {id, timestamp, ...} |
+| [Entity1StatusChanged] | When status changes | {id, oldStatus, newStatus} |
+
+## Domain Services
+# Operations that don't naturally belong to any entity
+# Format: Service Name | Purpose | Input | Output
+
+| Service | Purpose | Input | Output |
+|---------|---------|-------|--------|
+| [Service1] | [What it does] | [Parameters] | [Result] |
+
+# ============================================
+# SECTION 4: FUNCTIONAL REQUIREMENTS BY LAYER
+# ============================================
+# Organize requirements by architectural layer.
+# This helps Task Master generate properly layered tasks.
+
+## Domain Layer Requirements
+# Pure business logic - NO infrastructure concerns!
+
+### Entities to Implement
+- [ ] [Entity1]: [Description of business behavior]
+  - Method: [methodName] - [what it does]
+  - Invariant: [business rule to enforce]
+
+### Value Objects to Implement
+- [ ] [ValueObject1]: [Description, validation rules]
+
+### Domain Events to Implement
+- [ ] [Event1]: [When it's published, what data it carries]
+
+## Application Layer Requirements
+# Use cases that orchestrate domain objects
+
+### Use Cases (Commands)
+# Operations that change state
+
+- [ ] [CreateEntity1UseCase]
+  - Input: [Required data]
+  - Output: [Created entity ID]
+  - Steps:
+    1. Validate input
+    2. Create domain objects
+    3. Persist via repository
+    4. Publish domain events
+
+- [ ] [UpdateEntity1UseCase]
+  - Input: [ID + update data]
+  - Output: [Success/Failure]
+
+### Use Cases (Queries)
+# Operations that read state
+
+- [ ] [GetEntity1Query]
+  - Input: [Entity ID]
+  - Output: [Entity DTO]
+
+- [ ] [ListEntitiesQuery]
+  - Input: [Filters, pagination]
+  - Output: [Paginated list of DTOs]
+
+## Infrastructure Layer Requirements
+# Technical implementations of domain interfaces
+
+### Repositories to Implement
+- [ ] [Entity1Repository]
+  - Storage: [Database type]
+  - Methods: save, findById, findByX
+
+### External Services
+- [ ] [ExternalService1]
+  - Integration: [API/SDK details]
+  - Purpose: [What it provides]
+
+## Interface Layer Requirements
+# API endpoints, CLI commands, UI components
+
+### REST API Endpoints
+- [ ] POST /api/v1/[entities] - Create entity
+- [ ] GET /api/v1/[entities]/{id} - Get by ID
+- [ ] PUT /api/v1/[entities]/{id} - Update entity
+- [ ] DELETE /api/v1/[entities]/{id} - Delete entity
+- [ ] GET /api/v1/[entities] - List with filters
+
+# ============================================
+# SECTION 5: ARCHITECTURE CONSTRAINTS
+# ============================================
+# Non-negotiable rules for the implementation
+
+## Dependency Rules (CRITICAL)
+1. Domain layer has ZERO external dependencies
+2. Application layer depends only on Domain interfaces
+3. Infrastructure implements Domain interfaces
+4. Interface layer uses Application layer services
+
+## Layer Isolation
+- All cross-layer communication through interfaces
+- No database types in domain layer
+- DTOs only at interface layer
+
+## Event Guidelines
+- Domain events are published within aggregate transactions
+- Application layer dispatches to external handlers
+- Use eventual consistency for cross-context communication
+
+# ============================================
+# SECTION 6: ACCEPTANCE CRITERIA
+# ============================================
+# How do we know when we're done?
+
+## Testing Requirements
+- [ ] Unit tests for all domain logic (>80% coverage)
+- [ ] No mocks needed for domain layer tests
+- [ ] Integration tests for all use cases
+- [ ] E2E tests for critical user paths
+
+## Architecture Validation
+- [ ] No architecture violations (run validate:layers)
+- [ ] Domain events published for all state changes
+- [ ] Ubiquitous language used consistently
+
+## Documentation
+- [ ] Updated ubiquitous-language.md
+- [ ] API documentation generated
+- [ ] Context map updated if new contexts added
+
+# ============================================
+# SECTION 7: IMPLEMENTATION PHASES
+# ============================================
+# Suggested order for implementation
+
+## Phase 1: Domain Foundation
+Priority: Highest
+- Define all entities and value objects
+- Implement aggregate roots with invariants
+- Create domain events
+
+## Phase 2: Application Layer
+Priority: High
+- Implement core use cases
+- Set up command/query handlers
+- Configure event publishing
+
+## Phase 3: Infrastructure
+Priority: Medium
+- Implement repository adapters
+- Configure database connections
+- Set up external service clients
+
+## Phase 4: Interface Layer
+Priority: Medium
+- Create API controllers
+- Implement DTOs and mappers
+- Add authentication/authorization
+
+## Phase 5: Testing & Polish
+Priority: High
+- Complete test coverage
+- Performance optimization
+- Documentation
+
+# ============================================
+# ANTI-PATTERNS TO AVOID
+# ============================================
+# Common mistakes that Task Master should NOT generate
+
+## ❌ Don't Do This:
+- Anemic domain models (entities with only getters/setters)
+- Business logic in use cases instead of domain
+- Direct database access from domain layer
+- Returning entities from API endpoints
+- Cross-aggregate transactions
+- Generic CRUD without business meaning
+
+## ✅ Do This Instead:
+- Rich domain models with behavior
+- Orchestration in use cases, logic in domain
+- Repository pattern with domain interfaces
+- DTOs for API responses
+- One aggregate per transaction
+- Named operations reflecting ubiquitous language
+
+# ============================================
+# NOTES
+# ============================================
+# Additional context for Task Master
+
+[Add any additional notes, constraints, or context here]
