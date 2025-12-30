@@ -1,0 +1,11 @@
+# Integration Tests
+# Place application layer tests here.
+# Use mocked repositories to test use cases.
+# 
+# Example structure:
+# tests/integration/
+# ├── [context]/
+# │   └── application/
+# │       ├── [UseCase].spec.ts
+# │       └── handlers/
+# │           └── [Handler].spec.ts

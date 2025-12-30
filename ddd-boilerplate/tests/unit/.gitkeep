@@ -1,0 +1,11 @@
+# Unit Tests
+# Place domain layer tests here.
+# Unit tests should not require mocks for domain logic.
+# 
+# Example structure:
+# tests/unit/
+# ├── [context]/
+# │   └── domain/
+# │       ├── [Aggregate].spec.ts
+# │       ├── [Entity].spec.ts
+# │       └── [ValueObject].spec.ts

@@ -1,0 +1,171 @@
+{
+  "name": "ddd-taskmaster-flow",
+  "version": "2.0.0",
+  "description": "Integrated DDD Architecture + Task Master workflow",
+  "claudeFlow": {
+    "memory": {
+      "defaultNamespace": "architecture",
+      "namespaces": [
+        "domain",
+        "application",
+        "infrastructure",
+        "interface",
+        "architecture",
+        "tasks"
+      ],
+      "reasoningBank": {
+        "enabled": true,
+        "storage": ".swarm/memory.db"
+      },
+      "agentdb": {
+        "enabled": true,
+        "vectorSearch": {
+          "k": 5,
+          "threshold": 0.7
+        }
+      }
+    },
+    "swarm": {
+      "patternsDir": ".swarm/patterns",
+      "sessionsDir": ".swarm/sessions",
+      "logsDir": ".swarm/logs"
+    }
+  },
+  "triggers": {
+    "on_task_created": {
+      "description": "Triggered when a new task is created from PRD",
+      "actions": [
+        "validate_task_against_architecture",
+        "check_layer_assignment",
+        "verify_naming_conventions"
+      ]
+    },
+    "on_task_started": {
+      "description": "Triggered when a task status changes to in-progress",
+      "actions": [
+        "checkout_feature_branch",
+        "setup_test_structure",
+        "load_relevant_context"
+      ]
+    },
+    "on_task_completed": {
+      "description": "Triggered when a task is marked as completed",
+      "actions": [
+        "run_architecture_validation",
+        "run_tests",
+        "update_documentation"
+      ]
+    },
+    "on_prd_updated": {
+      "description": "Triggered when PRD file is modified",
+      "actions": [
+        "regenerate_tasks",
+        "update_complexity_report",
+        "notify_stakeholders"
+      ]
+    }
+  },
+  "integrations": {
+    "taskmaster": {
+      "enabled": true,
+      "auto_validate": true,
+      "architecture_check": true,
+      "test_generation": false,
+      "documentation_update": true,
+      "prd_path": ".taskmaster/docs/prd.txt",
+      "tasks_path": ".taskmaster/tasks/"
+    }
+  },
+  "workflows": {
+    "task_implementation": {
+      "description": "Standard workflow for implementing a task following DDD principles",
+      "steps": [
+        {
+          "name": "parse_task_requirements",
+          "description": "Understand what the task requires"
+        },
+        {
+          "name": "identify_affected_layers",
+          "description": "Determine which DDD layers are involved"
+        },
+        {
+          "name": "implement_domain_logic",
+          "description": "Implement domain layer first (entities, value objects, events)",
+          "validation": "validate:layers"
+        },
+        {
+          "name": "implement_application_logic",
+          "description": "Implement use cases and handlers",
+          "validation": "validate:layers"
+        },
+        {
+          "name": "implement_infrastructure",
+          "description": "Implement repository implementations and external services"
+        },
+        {
+          "name": "implement_interface",
+          "description": "Implement controllers and API endpoints"
+        },
+        {
+          "name": "validate_architecture",
+          "description": "Run full architecture validation",
+          "command": "npm run validate:layers"
+        },
+        {
+          "name": "run_tests",
+          "description": "Execute test suite",
+          "command": "npm test"
+        },
+        {
+          "name": "update_task_status",
+          "description": "Mark task as completed"
+        }
+      ]
+    },
+    "prd_to_tasks": {
+      "description": "Workflow for converting PRD to actionable tasks",
+      "steps": [
+        {
+          "name": "review_prd",
+          "description": "Validate PRD structure and DDD alignment"
+        },
+        {
+          "name": "identify_bounded_contexts",
+          "description": "Extract bounded contexts from PRD"
+        },
+        {
+          "name": "define_ubiquitous_language",
+          "description": "Document domain vocabulary"
+        },
+        {
+          "name": "generate_tasks",
+          "description": "Parse PRD with Task Master",
+          "command": "npm run task:parse"
+        },
+        {
+          "name": "prioritize_tasks",
+          "description": "Order tasks by domain layer first"
+        }
+      ]
+    }
+  },
+  "validation": {
+    "architecture": {
+      "enabled": true,
+      "rules": [
+        "domain_no_outer_imports",
+        "repository_interface_in_domain",
+        "dto_only_in_interface",
+        "events_are_immutable"
+      ]
+    },
+    "naming": {
+      "enabled": true,
+      "rules": [
+        "entity_pascal_case",
+        "event_past_tense",
+        "use_case_action_entity"
+      ]
+    }
+  }
+}
