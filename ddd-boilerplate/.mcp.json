@@ -1,14 +1,11 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Claude Code MCP Configuration - filesystem サーバーは意図的に除外（コンテキストオーバーフロー防止）",
   "mcpServers": {
     "memory": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-memory"],
       "description": "Persistent memory for storing domain context and ubiquitous language"
-    },
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
-      "description": "File system access for project management"
     },
     "sequential-thinking": {
       "command": "npx",
@@ -31,6 +28,14 @@
         "TASK_MASTER_RESEARCH_MODEL": "perplexity/sonar-pro"
       },
       "description": "AI-powered task management for DDD/Clean Architecture development with research capabilities"
+    }
+  },
+  "_disabled_servers": {
+    "_comment": "以下のサーバーは意図的に無効化しています。有効にする場合は mcpServers に移動してください。",
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./src", "./tests", "./docs"],
+      "description": "⚠️ 警告: directory_tree コマンドは node_modules を含む巨大なレスポンスを返す可能性があります。Claude Code の組み込みツール（Read, Write, LS, Glob）を使用することを推奨します。"
     }
   }
 }

@@ -543,5 +543,94 @@ Research domain event handling patterns in Node.js
 
 ---
 
-**Last Updated**: 2025-12-30
-**Version**: 2.0.0
+## ⚠️ Claude Code での安全なファイル探索
+
+### 重要: MCP filesystem サーバーについて
+
+このボイラープレートでは、**MCP `filesystem` サーバーは意図的に無効化**しています。
+
+**理由:**
+- `directory_tree` コマンドが `node_modules` を含む巨大なレスポンス（数百万トークン）を返す
+- コンテキストウィンドウがオーバーフローし、セッションが使用不能になる
+- Claude Code には組み込みのファイル操作ツールがあり、MCP filesystem は不要
+
+### Claude Code 組み込みツール（推奨）
+
+Claude Code CLI には以下の安全な組み込みツールがあります：
+
+| ツール | 用途 | 説明 |
+|--------|------|------|
+| `Read` | ファイル読み取り | 単一ファイルの内容を取得 |
+| `Write` | ファイル作成 | 新規ファイルを作成 |
+| `Edit` | ファイル編集 | 既存ファイルを部分的に編集 |
+| `MultiEdit` | 複数編集 | 1ファイル内の複数箇所を編集 |
+| `LS` | ディレクトリ一覧 | `.gitignore` を尊重した安全なリスト |
+| `Glob` | パターン検索 | ファイルパターンでの検索 |
+| `Grep` | テキスト検索 | 正規表現でのコード検索 |
+| `Bash` | コマンド実行 | シェルコマンドの実行 |
+
+### 危険な操作を避ける
+
+**❌ 絶対に使用禁止:**
+
+```bash
+# ❌ MCP filesystem の directory_tree（コンテキストオーバーフローの原因）
+filesystem - directory_tree (MCP)
+
+# ❌ プロジェクトルートでの無制限なリスト取得
+filesystem - list_directory "/" (MCP)
+```
+
+**✅ 代わりに使うべき安全な操作:**
+
+```bash
+# ✅ 組み込み LS ツール
+LS ./src
+
+# ✅ パターンマッチング
+Glob "src/**/*.ts"
+
+# ✅ コード検索
+Grep "class.*Entity"
+
+# ✅ シェルコマンド（必要な場合）
+Bash "find src -name '*.ts' -type f | head -20"
+```
+
+### コンテキストオーバーフローの症状と対処
+
+**症状:**
+```
+API Error: 400 Input is too long for requested model.
+```
+
+または
+
+```
+⚠ Large MCP response (~3.8m tokens), this can fill up context quickly
+```
+
+**対処方法:**
+1. 現在のセッションを終了（`/exit` または `Ctrl+C`）
+2. 新しいセッションを開始（`claude`）
+3. 問題の操作を避けて再実行
+
+### MCP filesystem を有効にしたい場合
+
+特別な理由で `filesystem` サーバーが必要な場合は、`.mcp.json` の `_disabled_servers` から `mcpServers` に移動してください。ただし、以下を厳守：
+
+1. **ディレクトリを制限**: `["./src", "./tests", "./docs"]` のみ
+2. **directory_tree は絶対に使用しない**
+3. **list_directory は浅いディレクトリのみ**
+
+### 大規模プロジェクトでの探索戦略
+
+1. **段階的に探索**: ルートから一度に深く探索しない
+2. **パターンで絞り込む**: `Glob "src/**/*.ts"` で特定のファイルタイプのみ
+3. **小さいスコープで始める**: 特定のディレクトリから探索開始
+4. **head で制限**: `Bash "find . -name '*.ts' | head -50"`
+
+---
+
+**Last Updated**: 2025-12-31
+**Version**: 2.2.0
