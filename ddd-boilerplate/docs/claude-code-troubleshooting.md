@@ -176,7 +176,7 @@ A: はい。すべてのモデルにはコンテキストウィンドウの制�
 
 - [CLAUDE.md](../CLAUDE.md) - Claude Code 統合ガイド
 - [FLOW.md](../FLOW.md) - 開発フローガイド
-- [MCP 設定](./.mcp.json) - MCP サーバー設定
+ - [MCP 設定](../.mcp.json) - MCP サーバー設定
 
 ---
 
